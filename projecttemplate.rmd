@@ -1,0 +1,401 @@
+
+# Red Wine Exploration by Nebiyou Abebe
+========================================================
+
+What property does it makes a good red wine? I am trying to answer for this question by exploring the red wine data set.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using 
+# in your analysis in this code chunk.
+
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. 
+# This prevents the code from displaying in the knitted HTML output. 
+# You should set echo=FALSE for all code chunks in your file. .
+
+library(ggplot2)
+library(GGally)
+library(scales)
+library(lattice)
+library(MASS)
+library(memisc)
+library(dplyr)
+library(reshape)
+library(gridExtra)
+
+```
+
+```{r echo=FALSE, Load_the_Data}
+
+# Load the Data
+redwine <- read.csv("wineQualityReds.csv")
+
+```
+
+# Introduction
+
+"The inputs include objective tests (e.g. PH values) and the output is based on sensory data (median of at least 3 evaluations made by wine experts). Each expert graded the wine quality between 0 (very bad) and 10 (very excellent). Several data mining methods were applied to model these datasets under a regression approach. The support vector machine model achieved the best results. Several metrics were computed: MAD, confusion matrix for a fixed error tolerance (T),etc. Also, we plot the relative importances of the input variables (as measured by a sensitivity analysis procedure)." - P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis.
+
+# Univariate Plots Section
+
+This red wine data set contains 1,599 observations with 13 variables on the chemical properties of the wine. 
+
+
+
+```{r echo=FALSE, Univariate_Plots}
+
+ggplot(aes(x = quality), data = redwine)+ geom_bar(fill="993366")+
+#geom_histogram(colour="black", fill="#993366", binwidth = 0.5)+ 
+# scale_x_continuous(breaks = seq(1,10))+
+xlab("wine grade") + ylab("count")+ ggtitle("Distribution of wine Quality") 
+
+```
+
+The structure of my dataset is a moderately skewed distribution the longer tail on the right is said to be postively skewed.
+
+
+
+```{r}
+
+ggplot(redwine, aes(citric.acid))+geom_histogram(colour = "black", fill="#993366", binwidth = 0.1)
+
+```
+
+
+The structure of my dataset of the citric acid  is a random distribution.
+
+
+```{r}
+
+ggplot(redwine, aes(volatile.acidity))+geom_histogram(colour = "black", fill = "993366", binwidth = 0.1)+ggtitle("Volatile acidity  of wine Quality")
+
+```
+
+
+The structure of my dataset of the volatle acidity is  a random distribution.
+
+These two plots are about the acid in wine and the shape of them are similar.  Beside this when too much acid make the taste is too sour and too little acid is may lose of the taste wine.
+
+
+
+```{r}
+
+ggplot(redwine, aes(residual.sugar))+ geom_histogram(colour = "black", fill = "993366", binwidth = 1)
+
+```
+
+
+The structure of my dataset of residual sugar with Normal curve. This residual wine normal curve because it's cheap in price.
+
+
+```{r}
+
+ggplot(redwine, aes(chlorides))+ geom_histogram(colour = "black", fill = "993366", binwidth = 0.05)
+
+```
+
+
+The structure of chlorides is left skewed distribution.
+
+These two plots(residual sugar and chlorides) are about the sweet of the wine. 
+
+# Univariate Analysis
+
+
+
+### What is the structure of your dataset?
+The structure of my dataset is a normal distribution that is the bell-shaped and symmetrical.
+
+### What is/are the main feature(s) of interest in your dataset?
+The main feature of interst in my dataset is am intersted to know that what factor is the most important to evaluateed high and low quality of wines. 
+
+### What other features in the dataset do you think will help support your \
+investigation into your feature(s) of interest?
+
+The other features investigate in the dataset are the chlorides, residual-sugar, volatile acidity and citric acid. These investigartion is all about the sweatness and sour of the wine.
+
+### Did you create any new variables from existing variables in the dataset?
+No, I didn't create any new variables from existing variables in the dataset.
+
+### Of the features you investigated, were there any unusual distributions? \
+Did you perform any operations on the data to tidy, adjust, or change the form 
+of the data? If so, why did you do this?
+
+I didn't found any erronous in the redwine data set. So, I didn't adjust or change in the form of data.
+
+# Bivariate Plots Section
+
+
+
+```{r echo=FALSE, Bivariate_Plots}
+
+ggplot(redwine, aes(x = alcohol, y = density))+
+geom_point(colour = "blue")+geom_smooth(colour= "red", method = "lm",
+se = FALSE)+ xlab("Alcohol level")+ylab("Density")+
+  geom_jitter(size = 0.2)+
+  ggtitle("Alcohol Influnce on Density")
+  
+```
+
+When the density is increases and the alchole levels will decrease. 
+The reverse is true. 
+
+
+```{r}
+
+ggplot(data = redwine, aes(x = factor(quality), y = alcohol)) + geom_jitter(alpha = 1/10) + geom_boxplot(alpha = 1/10, color = 'blue') + stat_summary(fun.y = 'mean', geom = 'point', color = 'red') + labs(x = 'Quality(score between 3 and 9)', y = 'Alcohol(% by volume)')+ ggtitle("Boxplot of alcohol across qualities")
+
+
+```
+
+
+When the quality of the wine increases and the alcohol level is also increases. It's directly proportional.
+
+```{r}
+
+ggplot(data = redwine, aes(x = factor(chlorides), y = alcohol)) + geom_jitter(alpha = 1/10) + geom_boxplot(alpha = 1/10, color = 'blue') + stat_summary(fun.y = 'mean', geom = 'point', color = 'red') + labs(x = 'Chloride(measure mg/l)', y = 'Alcohol(% by volume)')+ ggtitle("Boxplot of chlorides across ")
+
+
+
+```
+
+When we put the more chlorides we get the less test of the alcohole of the wine
+
+
+
+```{r}
+
+ggplot(aes(x = quality, y = alcohol), data = redwine) +
+  geom_point(alpha = 1/3, position = 'jitter')+
+     scale_x_continuous(breaks=seq(min(redwine$quality),
+                                   max(redwine$quality),1)) +
+  geom_smooth(method=lm, se=FALSE)+
+  ggtitle('Quality vs Alcohol')
+
+
+```
+
+
+When the alcohol content increases the the quality of the red wine is also increases. The reverse is true.
+
+
+
+```{r}
+
+ggplot(aes(x = density, y = fixed.acidity), data = redwine) +
+  geom_point(alpha = 1/3, position = 'jitter')+
+  geom_smooth(method=lm,se=FALSE)+
+  ggtitle('Density vs Fixed Acidity')
+
+
+```
+
+When the density is increases the fixed acidity is also increases.
+
+
+```{r}
+ggplot(data = redwine, aes(x = citric.acid, y = pH)) +
+  geom_point() + geom_smooth(method="lm")+
+  ggtitle('Comparision of pH and Citric Acid')
+
+```
+
+When the pH value decrease the citric acid increases. On the other hand, when the pH value increases the citric acid decreases.
+
+```{r}
+ggplot(aes(x = density, y = fixed.acidity), data = redwine) +
+  geom_point(alpha = 1/3, position = 'jitter')+
+  geom_smooth(method=lm,se=FALSE)+
+  ggtitle('Density vs Fixed Acidity')
+
+
+```
+
+When the density is increases the fixed acidity is also increases.
+
+
+
+```{r}
+
+ggplot(aes(x = sulphates, y = alcohol), data = redwine) +
+  geom_point(alpha = 0.5, position = 'jitter')+
+     scale_x_continuous(breaks=seq(min(redwine$quality),
+                                   max(redwine$quality),1)) +
+  geom_smooth(method=lm, se=FALSE)+
+  ggtitle('Sulphates vs Alcohol')
+
+
+```
+
+
+In all types alcohol contents of wine the sulphates contents should be very small amounts is needed.  
+
+
+# Bivariate Analysis
+
+
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. How did the feature(s) of interest vary with other features in \
+the dataset?
+
+In this part, the relationship between alcohol concentration and the density. Since, good wines have high alcohol concentration. The density of high alcohol wines is low density and the reverse is true. Therefore, alcohol and density are highly related with each others. 
+
+
+### Did you observe any interesting relationships between the other features \
+(not the main feature(s) of interest)?
+
+I observed that the relationships between alcohol and quality of wine. The good wines have high concentration of alcohol and the cheap wine is low concentration of alcohol. 
+
+ 
+### What was the strongest relationship you found?
+
+The strongest relationship I found is alcohol and quality of wine. Because,the quality of wine increases the alcohol levels is also increases. When the alcohol level decreases the quality of wine is also decreases. It have stron relationship betwen these two variables.
+
+# Multivariate Plots Section
+
+```{r}
+
+ggplot(redwine, aes(x = alcohol, y = sulphates, 
+                    color = quality))+geom_line()+
+ggtitle("Comparision of Alcohol and Sulphates for Different Quality of Wines")
+
+
+
+```
+
+The good quality of wine have small amount of sulphates and more content of alcohols.
+
+
+
+```{r}
+
+ggplot(redwine, aes(x=alcohol,y=sulphates)) +
+      geom_jitter(alpha=1/2,size=3)+
+      xlab("alcohol") + ylab("sulphates") +
+      scale_colour_gradient2(low="red", high="blue",
+                            mid="#9933CC",midpoint = 0.5)
+
+
+```
+
+
+The higher amount of sulphates the less quality of wine on the wine quality.
+
+
+```{r}
+
+ggplot(redwine, aes(y=alcohol,x=quality,color = volatile.acidity) )+
+        geom_jitter(alpha=1/10,size=3)+
+        xlab("alcohol") + ylab("wine quality") +
+        scale_colour_gradient2(low ="red", high="blue",
+                               mid="#9933CC",midpoint = 0.8)
+
+
+```
+
+
+Both alcohol and the quality are directly effect on the wine quality.
+
+
+
+```{r}
+
+ggplot(redwine, aes(x = pH, y = density, color = quality))+geom_line()+
+ggtitle("Comparision of pH and Density for Different Quality of Wines")
+
+
+
+```
+
+When the PH value is increases , the density is decreases. The reverse is true.
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. Were there features that strengthened each other in terms of \
+looking at your feature(s) of interest?
+
+In the pervious analysis section, I could show the difference between good and bad wines. In this section I tried to show normal and good wines without the alchol concentration.
+
+### Were there any interesting or surprising interactions between features?
+
+The intersting features for this wine is the lowest quality of wine has the highest density and red in colour. On the otherhand, the higher quality of wine has the purple colour and lower density. Therefore, the pH increases the density is decreases. 
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the \
+strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+
+
+### Plot One
+
+```{r echo=FALSE, plot_one}
+ggplot(aes(x = quality), data = redwine)+ geom_bar(fill="993366")+
+#geom_histogram(colour="black", fill="#993366", binwidth = 0.5)+ 
+# scale_x_continuous(breaks = seq(1,10))+
+xlab("wine grade") + ylab("count")+ ggtitle("Distribution of wine Quality")
+
+
+
+
+```
+
+
+
+The structure of my dataset is a moderately skewed distribution the longer tail on the right is said to be postively skewed.
+
+
+
+### Description One
+
+This graph is clearly shows the quality of wine. The high quality wine tend to have higher alcohol and lower volatile acidity content. The histogram describes clearly. 
+
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+ggplot(data = redwine, aes(x = factor(quality), y = alcohol)) + geom_jitter(alpha = 1/10) + geom_boxplot(alpha = 1/10, color = 'blue') + stat_summary(fun.y = 'mean', geom = 'point', color = 'red') + labs(x = 'Quality(score between 3 and 9)', y = 'Alcohol(% by volume)')+ ggtitle("Boxplot of alcohol across qualities")
+
+```
+
+When the quality of the wine increases and the alcohol level is also increases. It's directly proportional.
+
+### Description Two
+
+This box plot features are plotted  with color indicate wine quality. When the alcohol level decrease the the quality of wine is also decrease.  
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+
+ggplot(redwine, aes(x = pH, y = density, color = quality))+geom_line()+
+ggtitle("Comparision of pH and Density for Different Quality of Wines")
+
+
+
+```
+
+When the PH value is increases , the density is decreases. The reverse is true.
+
+
+
+### Description Three
+
+This graph explains the difference between "good" and "bad" wines. The lowest quality of wine has the lowest pH value and lowest density . On the otherhand, the highst quality of wine quality has the higher density and higher pH value. Therefore, the pH increases the the quality of wine is also increases. The reverse is true. 
+
+# Reflection
+
+The red wine dataset contains almost 1,599 observations and has 13 variables on the chemical properties. First, I tried to understand each of the variables. After that I plotted the three differnt methods of plots from the dataset. I found that the good wines have higher alchol and lower volatile acidity content. However, I had hard time to differntiate the good or bad wine interms of the alcohole influnce on the density. I learned wine contains many ingridents and all of them are quite important when we taste. our taste of wine can find out the sour of the wine. When the volatile acidity or citric acid  could help us the sour of the taste wine. 
+
+Future improvement can be made if the data contains years of made, the geographical area of the production, the quantity, the price and survey who tasted the wine.
+
+# Reference
+[1] http://www.oswego.edu/~srp/stats/normal_prb_plot.htm
+[2] http://www.pqsystems.com/qualityadvisor/DataAnalysisTools/interpretation/histogram_shape.php
+[3] https://www.google.com/search?q=right+skewed+histogram
+[4] https://winefornormalpeople.com/whats-the-difference-between-cheap-and-expensive-wine/
